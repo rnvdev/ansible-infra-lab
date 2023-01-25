@@ -1,7 +1,9 @@
-# terraform
-Terraform modules and resources
+# Terraform
+
+Terraform modules and resources<br>
+Terraform is a IaC _*(Infrastructure as Code)*_ tool.
 
 
 
 <hr>
-🟢 <strong><i>Hey!</strong> If you have some job opportunitie, let me know:</i> <strong>rnvdev.contato@gmail.com</strong>.
+🟢 *Hey*! _If you have some job opportunitie, let me know:_ **rnvdev.contato@gmail.com**.
