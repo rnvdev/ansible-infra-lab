@@ -78,11 +78,6 @@ data "external" "myipaddr" {
     program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
 
-# output "ip" {
-#     value = "${data.external.myipaddr.result.ip}"
-# }
-
-
 #SECURITY GROUP
 resource "aws_security_group" "ssh-rule" {
   name        = "allow_SSH"
