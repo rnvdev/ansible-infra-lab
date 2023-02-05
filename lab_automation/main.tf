@@ -22,7 +22,7 @@ provider "aws" {
 }
 
 
-# VPC
+
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
@@ -31,7 +31,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-# INTERNET-GATEWAY:
+
 resource "aws_internet_gateway" "example" {
   vpc_id = aws_vpc.main.id
 
@@ -41,7 +41,7 @@ resource "aws_internet_gateway" "example" {
 }
 
 
-# ROUTE-TABLE (PUBLIC)
+
 resource "aws_route_table" "example" {
   vpc_id = aws_vpc.main.id
 
@@ -55,14 +55,14 @@ resource "aws_route_table" "example" {
   }
 }
 
-#ROUTE-RABLE-ASSOCIATION:
+
 resource "aws_main_route_table_association" "a" {
   vpc_id         = aws_vpc.main.id
   route_table_id = aws_route_table.example.id
 }
 
 
-# SUBNET:
+
 resource "aws_subnet" "main" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.1.0/24"
@@ -73,19 +73,19 @@ resource "aws_subnet" "main" {
   }
 }
 
-# ROUTE TABLE ASSOCIATION:
+
 resource "aws_route_table_association" "association" {
   subnet_id      = aws_subnet.main.id
   route_table_id = aws_route_table.example.id  
 }
 
-# GENERATE KEY.PEM
+
 resource "tls_private_key" "pk" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-# SET KEY ON AWS AND CREATE A KEY.PEM FILE IN YOUR CURRENT DIRECTORY:
+
 resource "aws_key_pair" "kp" {
   key_name   = "myKey"       
   public_key = tls_private_key.pk.public_key_openssh
@@ -95,12 +95,12 @@ resource "aws_key_pair" "kp" {
   }
 }
 
-# GET OUR IP:
+
 data "external" "myipaddr" {
     program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
 
-#SECURITY GROUP
+
 resource "aws_security_group" "ssh-rule" {
   name        = "allow_SSH"
   description = "Allow SSH inbound traffic"
@@ -128,7 +128,8 @@ resource "aws_security_group" "ssh-rule" {
     "Name" = "automation-script"
   }
 }
-# ECSs
+
+
 resource "aws_instance" "ec2" {
   ami                     = "ami-00874d747dde814fa"
   instance_type           = "t3.medium"
@@ -144,7 +145,7 @@ resource "aws_instance" "ec2" {
   }
 }
 
-# EIP:
+
 resource "aws_eip" "ec2-eips" {
   count    = length(aws_instance.ec2)
   instance = aws_instance.ec2[count.index].id
