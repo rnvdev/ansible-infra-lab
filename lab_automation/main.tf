@@ -25,11 +25,19 @@ provider "aws" {
 # VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
+
+  tags = {
+    "Name" = "automation-script"
+  }
 }
 
 # INTERNET-GATEWAY:
 resource "aws_internet_gateway" "example" {
   vpc_id = aws_vpc.main.id
+
+  tags = {
+    "Name" = "automation-script"
+  }
 }
 
 
@@ -42,6 +50,9 @@ resource "aws_route_table" "example" {
     gateway_id = aws_internet_gateway.example.id
   }
 
+  tags = {
+    "Name" = "automation-script"
+  }
 }
 
 #ROUTE-RABLE-ASSOCIATION:
@@ -53,8 +64,19 @@ resource "aws_main_route_table_association" "a" {
 
 # SUBNET:
 resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+
+  tags = {
+    "Name" = "automation-script"
+  }
+}
+
+# ROUTE TABLE ASSOCIATION:
+resource "aws_route_table_association" "association" {
+  subnet_id      = aws_subnet.main.id
+  route_table_id = aws_route_table.example.id  
 }
 
 # GENERATE KEY.PEM
@@ -89,7 +111,8 @@ resource "aws_security_group" "ssh-rule" {
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
-    cidr_blocks      = ["${data.external.myipaddr.result.ip}/32"]
+    # cidr_blocks      = ["${data.external.myipaddr.result.ip}/32"]
+    cidr_blocks = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
 
@@ -105,7 +128,6 @@ resource "aws_security_group" "ssh-rule" {
     "Name" = "automation-script"
   }
 }
-
 # ECSs
 resource "aws_instance" "ec2" {
   ami                     = "ami-00874d747dde814fa"
@@ -115,9 +137,16 @@ resource "aws_instance" "ec2" {
   vpc_security_group_ids  = [aws_security_group.ssh-rule.id]
   disable_api_termination = false
   subnet_id               = aws_subnet.main.id
- 
-  
+  availability_zone       = "us-east-1a"
+
   tags = {
-    Name = "Server ${count.index}"
+    "Name" = "automation-script"
   }
+}
+
+# EIP:
+resource "aws_eip" "ec2-eips" {
+  count    = length(aws_instance.ec2)
+  instance = aws_instance.ec2[count.index].id
+  vpc      = true
 }
