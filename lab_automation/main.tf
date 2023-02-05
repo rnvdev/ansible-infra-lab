@@ -21,8 +21,6 @@ provider "aws" {
   secret_key = "x"
 }
 
-
-
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
@@ -31,7 +29,6 @@ resource "aws_vpc" "main" {
   }
 }
 
-
 resource "aws_internet_gateway" "example" {
   vpc_id = aws_vpc.main.id
 
@@ -39,8 +36,6 @@ resource "aws_internet_gateway" "example" {
     "Name" = "automation-script"
   }
 }
-
-
 
 resource "aws_route_table" "example" {
   vpc_id = aws_vpc.main.id
@@ -55,13 +50,10 @@ resource "aws_route_table" "example" {
   }
 }
 
-
 resource "aws_main_route_table_association" "a" {
   vpc_id         = aws_vpc.main.id
   route_table_id = aws_route_table.example.id
 }
-
-
 
 resource "aws_subnet" "main" {
   vpc_id            = aws_vpc.main.id
@@ -73,18 +65,15 @@ resource "aws_subnet" "main" {
   }
 }
 
-
 resource "aws_route_table_association" "association" {
   subnet_id      = aws_subnet.main.id
   route_table_id = aws_route_table.example.id  
 }
 
-
 resource "tls_private_key" "pk" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
-
 
 resource "aws_key_pair" "kp" {
   key_name   = "myKey"       
@@ -95,11 +84,9 @@ resource "aws_key_pair" "kp" {
   }
 }
 
-
 data "external" "myipaddr" {
     program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
-
 
 resource "aws_security_group" "ssh-rule" {
   name        = "allow_SSH"
@@ -128,7 +115,6 @@ resource "aws_security_group" "ssh-rule" {
   }
 }
 
-
 resource "aws_instance" "ec2" {
   ami                     = "ami-00874d747dde814fa"
   instance_type           = "t3.medium"
@@ -143,7 +129,6 @@ resource "aws_instance" "ec2" {
     "Name" = "automation-script"
   }
 }
-
 
 resource "aws_eip" "ec2-eips" {
   count    = length(aws_instance.ec2)
