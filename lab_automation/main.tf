@@ -22,8 +22,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "./vpc"
-
+  source     = "./vpc"
   cidr_block = "10.0.0.0/16"
   name       = "automation-script"
 }
@@ -35,18 +34,16 @@ module "igw" {
   name   = "automation-script"
 }
 
-# resource "aws_route_table" "example" {
-#   vpc_id = aws_vpc.main.id
+module "rt-public" {
+  source = "./rt"
+  vpc_id = module.vpc.id
+  name   = "automation-script"
 
-#   route {
-#     cidr_block = "0.0.0.0/0"
-#     gateway_id = aws_internet_gateway.example.id
-#   }
-
-#   tags = {
-#     "Name" = "automation-script"
-#   }
-# }
+  route = {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = module.igw.id
+  }
+}
 
 # resource "aws_main_route_table_association" "a" {
 #   vpc_id         = aws_vpc.main.id
