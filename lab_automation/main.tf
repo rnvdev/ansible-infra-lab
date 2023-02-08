@@ -17,27 +17,27 @@ terraform {
 
 provider "aws" {
   region     = "us-east-1"
-  access_key = "AKIAX3DGRRRKQIFPUGTE"
-  secret_key = "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"
+  access_key = ""
+  secret_key = ""
 }
 
 module "vpc" {
   source     = "./vpc"
   cidr_block = "10.0.0.0/16"
-  name       = "automation-script"
+  name       = "automation-lab"
 }
 
 module "igw" {
   source = "./igw"
 
   vpc_id = module.vpc.id
-  name   = "automation-script"
+  name   = "automation-lab"
 }
 
 module "rt-public" {
   source = "./rt"
   vpc_id = module.vpc.id
-  name   = "automation-script"
+  name   = "automation-lab"
 
   route = {
     cidr_block = "0.0.0.0/0"
@@ -46,18 +46,19 @@ module "rt-public" {
 }
 
 module "subnet" {
-  source = "./subnet"
-
+  source            = "./subnet"
   vpc_id            = module.vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
-  name              = "automation-script"
+  name              = "automation-lab"
 }
 
-# resource "aws_route_table_association" "association" {
-#   subnet_id      = aws_subnet.main.id
-#   route_table_id = aws_route_table.example.id
-# }
+module "rt-association" {
+  subnet_id      = module.subnet.id
+  route_table_id = module.rt-public.id
+}
+
+
 
 # resource "tls_private_key" "pk" {
 #   algorithm = "RSA"
@@ -100,7 +101,7 @@ module "subnet" {
 #   }
 
 #   tags = {
-#     "Name" = "automation-script"
+#     "Name" = "automation-lab"
 #   }
 # }
 
@@ -116,7 +117,7 @@ module "subnet" {
 #   user_data               = ""
 
 #   tags = {
-#     "Name" = "automation-script-machine-${count.index}"
+#     "Name" = "automation-lab-machine-${count.index}"
 #   }
 # }
 
