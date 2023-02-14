@@ -123,9 +123,9 @@ resource "aws_instance" "ec2" {
   availability_zone       = "us-east-1a"
 
   user_data = element([
-    "${file("installs_machine_00.sh")}",
-    "${file("installs_machine_01.sh")}",
-    "${file("installs_machine_02.sh")}"
+    "${file("./scripts/installs_machine_00.sh")}",
+    "${file("./scripts/installs_machine_01.sh")}",
+    "${file("./scripts/installs_machine_02.sh")}"
   ], count.index)
 
   tags = {
