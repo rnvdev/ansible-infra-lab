@@ -7,8 +7,7 @@ avoid_list = [
     "autotfsec.py", 
     "scripts", 
     "main.tf:Zone.Identifier", 
-    "main.tf",
-    "output.txt"
+    "main.tf"
 ]
 
 for dir in dirs:
