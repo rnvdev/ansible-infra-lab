@@ -19,5 +19,5 @@ for dir in dirs:
         stderr=subprocess.STDOUT,
         shell=True)
     
-    print(f"SCANNING -------> {dir} <-------")
+    print(f"SCANNING:: {dir}")
     print(command.decode().split("!")[0])
