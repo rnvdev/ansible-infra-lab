@@ -106,12 +106,6 @@ resource "aws_security_group" "ssh-rule" {
   }
 }
 
-#variable "instance_tags" {
-#  type = list
-#  default = ["ansible-01", "webserver-01", "webserver-02"]
-#}
-
-
 resource "aws_instance" "ec2" {
   ami                     = "ami-00874d747dde814fa"
   instance_type           = "t3.medium"
