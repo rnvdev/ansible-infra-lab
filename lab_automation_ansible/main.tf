@@ -16,9 +16,7 @@ terraform {
 }
 
 provider "aws" {
-  region     = "us-east-1"
-  access_key = ""
-  secret_key = ""
+  region     = var.aws_region
 }
 
 module "vpc" {
@@ -49,7 +47,7 @@ module "subnet" {
   source            = "./subnet"
   vpc_id            = module.vpc.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  availability_zone = var.availability_zone
   name              = "automation-lab"
 }
 
@@ -69,10 +67,6 @@ resource "tls_private_key" "pk" {
 resource "aws_key_pair" "kp" {
   key_name   = "myKey"
   public_key = tls_private_key.pk.public_key_openssh
-
-  provisioner "local-exec" {
-    command = "echo '${tls_private_key.pk.private_key_pem}' > ./myKey.pem"
-  }
 }
 
 data "external" "myipaddr" {
@@ -107,14 +101,14 @@ resource "aws_security_group" "ssh-rule" {
 }
 
 resource "aws_instance" "ec2" {
-  ami                     = "ami-00874d747dde814fa"
-  instance_type           = "t3.medium"
+  ami                     = var.ec2_ami_id
+  instance_type           = var.ec2_instance_type
   count                   = 3
   key_name                = aws_key_pair.kp.key_name
   vpc_security_group_ids  = [aws_security_group.ssh-rule.id]
   disable_api_termination = false
   subnet_id               = module.subnet.id
-  availability_zone       = "us-east-1a"
+  availability_zone       = var.availability_zone
 
   user_data = element([
     "${file("./scripts/installs_machine_00.sh")}",
@@ -135,4 +129,10 @@ resource "aws_eip" "ec2-eips" {
   count    = length(aws_instance.ec2)
   instance = aws_instance.ec2[count.index].id
   vpc      = true
+}
+
+output "private_key_pem" {
+  description = "Private key for SSH access to EC2 instances. Save this securely if needed."
+  value       = tls_private_key.pk.private_key_pem
+  sensitive   = true
 }
